@@ -57,6 +57,7 @@ Below, we take $n$ to be any numeric value and $s$ to be any string value surrou
 \mid \qamp \tstr \prop{p} \\
 \mid \qamp \truet \\
 \mid \qamp \falset \\
+\mid \qamp \tbool \\
 \mid \qamp \jobj{} \\
 \mid \qamp \jobj{kvl} \\
 \mid \qamp \jarr{\tau} \\
@@ -74,9 +75,44 @@ Part 2:
 % space out multiple assumptions.
 \begin{mathpar}
 
+% literals
+
 \ir{S-Bool-False}{\ }{\matches{\falset}{\tbool}}
 
 \ir{S-Bool-True}{\ }{\matches{\truet}{\tbool}}
+
+\ir{S-Num-n}{\ }{\matches{n}{\tnum}}
+
+\ir{S-String-s}{\ }{\matches{s}{\tstr}}
+
+\ir{S-Literal}{\ }{\matches{literal}{literal}}
+
+% quantifiers
+
+\ir{S-LessThan}{n < X}{\matches{n}{\plt{X}}}
+
+\ir{S-GreaterThan}{n > X}{\matches{n}{\pgt{X}}}
+
+\ir{S-EqualTo}{n = X}{\matches{n}{\peq{X}}}
+
+% boolean logic
+
+\ir{S-Or-TrueWhatever}{\matches{j}{expr_1}}{\matches{j}{expr_1 \lor expr_2}}
+
+\ir{S-Or-WhateverTrue}{\matches{j}{expr_2}}{\matches{j}{expr_1 \lor expr_2}}
+
+\ir{S-And-TrueTrue}{\matches{j}{expr_1} \\ \matches{j}{expr_2}}{\matches{j}{expr_1 \land expr_2}}
+
+% JSON structures
+
+\ir{S-Array}{\forall i = 0 \ldots |j|-1 \ . \ \matches{j_i}{\tau}}{\matches{\jarr{j^*}}{\jarr{\tau}}}
+
+% Not sure if this is the right way to notate it, but it's supposed to say that a matched key and a matched value lead to a matched key-value pair
+\ir{S-KeyValue}{\matches{s'}{s} \\ \matches{j}{\tau}}{\matches{j_{s'}}{s: \tau}}
+
+\ir{S-Obj}
+  {\forall s' \in s \ . \ \matches{s':j_{s'}}{kv}}
+  {\matches{\jobj{(s: j)^*}}{\jobj{kvl}}}
 
 % Inference rules go here
 
