@@ -36,12 +36,35 @@
 
 Part 1:
 
+Below, we take $n$ to be any numeric value and $s$ to be any string value surrounded by single quotes.
+
 \begin{alignat*}{1}
 \msf{Property}~p ::= \qamp \varepsilon \\
-\mid \qamp \ldots \\
+\mid \qamp Expr \\
+\mid \qamp AndExpr \\
+\mid \qamp Expr \lor AndExpr \\
+\mid \qamp (AndExpr) \lor AndExpr \\
+\\
+\msf{And{\mhyphen}Expression}~AndExpr ::= \qamp Expr \land Expr \\
+\mid \qamp Expr \land p \\
+\\
+\msf{Expression}~Expr ::= \qamp \pgt{n} \\
+\mid \qamp \plt{n} \\
+\mid \qamp \peq{n} \\
+\mid \qamp \peq{s} \\
 \\
 \msf{Schema}~\tau ::= \qamp \tnum \prop{p} \\
-\mid \qamp \ldots
+\mid \qamp \tstr \prop{p} \\
+\mid \qamp \truet \\
+\mid \qamp \falset \\
+\mid \qamp \jobj{} \\
+\mid \qamp \jobj{kvl} \\
+\mid \qamp \jarr{\tau} \\
+\\
+\msf{Key{\mhyphen}Value\ List}~kvl ::= \qamp kv \\
+\mid \qamp kv , kvl \\
+\\
+\msf{Key{\mhyphen}Value}~kv ::= s : \tau
 \end{alignat*}
 
 Part 2:
