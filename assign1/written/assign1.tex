@@ -93,7 +93,7 @@ Part 2:
 
 \ir{S-GreaterThan}{n > X}{\matches{n}{\pgt{X}}}
 
-\ir{S-EqualTo}{n = X}{\matches{n}{\peq{X}}}
+\ir{S-EqualTo}{\ }{\matches{n}{\peq{n}}}
 
 % boolean logic
 
@@ -115,7 +115,6 @@ Part 2:
   {\forall s' \in s \ . \ \matches{s':j_{s'}}{kv}}
   {\matches{\jobj{(s: j)^*}}{\jobj{kvl}}}
 
-% Inference rules go here
 
 \end{mathpar}
 
@@ -127,7 +126,7 @@ Part 1:
 
 \ir{S-Array}{\ }{\steps{([n]\ a, \jarr{\ldots,j_n,\ldots})}{(a, j_n)}}
 
-\ir{S-Property}{\ }{\steps{(.s'\ a, \jobj{s': j',\ldots})}{(a, j')}}
+\ir{S-Property}{\ }{\steps{(\akey{s}{a}, \jobj{s': j',\ldots})}{(a, j')}}
 
 \ir{S-Map}{\forall i=0 \ldots {j}-1 \ . \ \steps{(a, j_i)}{(b, j'_i)}}{\steps{(\apipe{a}, \jarr{j^*})}{(b, \jarr{j'^*})}}
 
@@ -140,7 +139,18 @@ Part 1:
 Part 2:
 
 \begin{mathpar}
-% Inference rules go here
+
+% base case: epsilon always matches; it extracts the current JSON value
+\ir{S-BaseCase}{\ }{\matches{\aeps}{\tau}}
+
+% pre-conditions are the same for these two
+\ir{S-Map}{\matches{a}{\tau}}{\matches{\apipe{a}}{\jarr{\tau}}}
+\ir{S-Index}{\matches{a}{\tau}}{\matches{\aidx{n}{a}}{\jarr{\tau}}}
+
+% Only have to match one key-value in an object schema
+\ir{S-Key}{\exists (s', \tau') \in \jobj{(s:\tau)^*} \ . \ s' = s \land \matches{a}{\tau'}}{\matches{\akey{s}{a}}{\jobj{(s:\tau)^*}}}
+
+
 \end{mathpar}
 
 \textit{Accessor safety}: for all $a, j, \tau$, if $\matches{a}{\tau}$ and $\matches{j}{\tau}$, then there exists a $j'$ such that $\evals{(a, j)}{\aeps, j'}$.
