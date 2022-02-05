@@ -110,6 +110,7 @@ Part 2:
 % Not sure if this is the right way to notate it, but it's supposed to say that a matched key and a matched value lead to a matched key-value pair
 \ir{S-KeyValue}{\matches{s'}{s} \\ \matches{j}{\tau}}{\matches{j_{s'}}{s: \tau}}
 
+% matching a key-value list gives you an object
 \ir{S-Obj}
   {\forall s' \in s \ . \ \matches{s':j_{s'}}{kv}}
   {\matches{\jobj{(s: j)^*}}{\jobj{kvl}}}
@@ -123,7 +124,17 @@ Part 2:
 Part 1:
 
 \begin{mathpar}
-% Inference rules go here
+
+\ir{S-Array}{\ }{\steps{([n]\ a, \jarr{\ldots,j_n,\ldots})}{(a, j_n)}}
+
+\ir{S-Property}{\ }{\steps{(.s'\ a, \jobj{s': j',\ldots})}{(a, j')}}
+
+\ir{S-Map}{\forall i=0 \ldots {j}-1 \ . \ \steps{(a, j_i)}{(b, j'_i)}}{\steps{(\apipe{a}, \jarr{j^*})}{(b, \jarr{j'^*})}}
+
+% Not sure if this is needed, but the instructions said there should be 4 rules, so 🤷
+
+\ir{S-Terminate}{\steps{(a\ b, j)}{(b, j')}}{\steps{(a, j)}{(\aeps, j)}}
+
 \end{mathpar}
 
 Part 2:
