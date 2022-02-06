@@ -11,7 +11,7 @@
 \newcommand{\peq}[1]{\, = {#1}}          % \peq{3} = = 3
 \newcommand{\prop}[1]{\langle{#1}\rangle}% \prop{x} = <x>
 \newcommand{\matches}[2]{{#1}\sim{#2}}   % \matches{a}{b} = a ~ b
-\newcommand{\aeps}{\varepsilon}          % \apes = epsilon
+\newcommand{\aeps}{\varepsilon}          % \aeps = epsilon
 \newcommand{\akey}[2]{.{#1}\,{#2}}       % \akey{s}{a} = .s a
 \newcommand{\aidx}[2]{[#1]\,{#2}}        % \aidx{i}{a} = [i] a
 \newcommand{\apipe}[1]{\mid {#1}}        % \apipe{a} = | a
@@ -130,9 +130,9 @@ Part 1:
 
 \ir{S-Map}{\forall i=0 \ldots {j}-1 \ . \ \steps{(a, j_i)}{(b, j'_i)}}{\steps{(\apipe{a}, \jarr{j^*})}{(b, \jarr{j'^*})}}
 
-% Not sure if this is needed, but the instructions said there should be 4 rules, so 🤷
+% Not sure if this makes any sense. Doesn't it technically mean we would step forever once the accessor is epsilon? But the prompt says we need four rules 🤷.
 
-\ir{S-Terminate}{\steps{(a\ b, j)}{(b, j')}}{\steps{(a, j)}{(\aeps, j)}}
+\ir{S-Terminate}{\ }{\steps{(\aeps,j)}{(\aeps,j)}}
 
 \end{mathpar}
 
@@ -153,10 +153,25 @@ Part 2:
 
 \end{mathpar}
 
-\textit{Accessor safety}: for all $a, j, \tau$, if $\matches{a}{\tau}$ and $\matches{j}{\tau}$, then there exists a $j'$ such that $\evals{(a, j)}{\aeps, j'}$.
+\textit{Accessor safety}: for all $a, j, \tau$, if $\matches{a}{\tau}$ and $\matches{j}{\tau}$, then there exists a $j'$ such that $\evals{(a, j)}{(\aeps, j')}$.
 
 \begin{proof}
-% Proof goes here.
+
+Because it's the simplest, we will proceed using structural induction on the accessor syntax.
+
+Base case: when $a = \aeps$, by S-Terminate no further steps are necessary and we have $\aeps,j$ for any JSON document $j$ and schema $\tau$.
+
+Now, assume that $\exists j' \ . \ \evals{(b, h)}{\aeps, j'}$, with $b$ a subterm of $a \neq \aeps$ and $h$ a subterm of $j$, both matching the schema subterm $\tau'$. There are three possibilities, given the form of $a$:
+
+Case $a$ of $\akey{s}{b}$: By inversion of S-Key, we know that $\tau$ specifies an object with the key $s$ and a value $\matches{v}{\tau'}$. By S-Obj, we also know that $\exists (s', j') \in j \ . \ s'=s, \matches{j'}{\tau'}$. Therefore, $\steps{(\akey{s}{b}, j)}{(b, h)}$ via S-Property.
+
+% This one actually surprised me. I had expected |b c to allow something like `|.'x'[3]`, but this would not match the schema. Instead you must do `[3] .x`. Using the pipe syntax, the only way for matching to work with both the document and the accessor using the same schema in this way is to map all of the rest of the operations in the accessor over the elements extracted in the pipe operator, meaning that the output document is guaranteed to be an array.
+Case $a$ of $\apipe{c}\ b$: $\matches{\apipe{c}\ b}{\tau}$ iff $\tau$ specifies an array structure (S-Map). The JSON document only matches such a schema if it is an array with each element matching $\tau'$ (S-Array). Therefore, $\steps{(\apipe{c}\ b, j)}{(b,\jarr{h^*})}$ via S-Map. The subsequent accesses specified by the subterm $b$ will then be applied to the individual elements of $\jarr{h^*}$, and we know that both $\matches{h}{\tau'}$ and $\matches{b}{\tau'}$, so successful access will still be guaranteed via the cases in this proof.
+
+Case $a$ of $\aidx{i}{b}$: by the same argument, $\matches{\aidx{i}{b}}{\tau}$ iff $\tau$ specifies an array structure (S-Map), and the JSON document must also be an array by S-Array. Therefore, $\steps{(\aidx{i}{b},j)}{(b,h)}$ by S-Array.
+
+Since $\forall a,j\ . \ \steps{(a,j)}{(b,h)}$, and the stepping will only stop once we hit a value of $\aeps$ for the accessor, it must be the case that $\evals{(a,j)}{(\aeps, j')}$.
+
 \end{proof}
 
 \end{document}
